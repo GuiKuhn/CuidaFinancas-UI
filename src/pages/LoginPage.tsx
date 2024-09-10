@@ -1,25 +1,32 @@
 import { Alert, Box, Button, TextField, Typography } from "@mui/material";
 import React from "react";
 import LoginRegisterBox from "../components/LoginRegisterBox";
-import { useAuth } from "../utils/hooks/useAuth";
+import { login } from "../utils/api/api";
 import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const [isLoading, setIsLoading] = React.useState(false);
   const navigate = useNavigate();
-  const { handleLogin, isLoading, error } = useAuth();
 
   const handleAuth = async () => {
-    const data = await handleLogin(email, password);
-    console.log(data);
-    console.log(error);
-    if (error) {
-      setErrorMessage(error);
-      return;
+    try {
+      setIsLoading(true);
+      const response = await login(email, password);
+      if (response.status !== 200) {
+        setErrorMessage(response.data.message);
+        throw new Error(response.data.message);
+      }
+      sessionStorage.setItem("token", response.data.token);
+      sessionStorage.setItem("email", email);
+      setIsLoading(false);
+      navigate("/home");
+    } catch (error: any) {
+      setErrorMessage(error.message);
+      setIsLoading(false);
     }
-    navigate("/home");
   };
   return (
     <Box
@@ -74,13 +81,13 @@ const LoginPage = () => {
           <Typography variant="body2" color="primary">
             Esqueceu a senha?
           </Typography>
-          <Alert
-            severity="error"
-            sx={{ display: errorMessage ? "block" : "none" }}
-          >
-            {errorMessage}
-          </Alert>
         </Box>
+        <Alert
+          severity="error"
+          sx={{ display: errorMessage ? "block" : "none" }}
+        >
+          {errorMessage}
+        </Alert>
       </LoginRegisterBox>
     </Box>
   );

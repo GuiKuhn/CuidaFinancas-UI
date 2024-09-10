@@ -1,8 +1,8 @@
 import { Alert, Box, Button, TextField, Typography } from "@mui/material";
 import React from "react";
 import LoginRegisterBox from "../components/LoginRegisterBox";
-import { useAuth } from "../utils/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { register } from "../utils/api/api";
 
 const RegisterPage = () => {
   const [name, setName] = React.useState("");
@@ -11,24 +11,31 @@ const RegisterPage = () => {
   const [balance, setBalance] = React.useState(0);
   const [totalIncome, setTotalIncome] = React.useState(0);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const [isLoading, setIsLoading] = React.useState(false);
   const navigate = useNavigate();
-  const { handleRegister, error, isLoading } = useAuth();
 
   const handleAuth = async () => {
-    const data = await handleRegister(
-      email,
-      password,
-      name,
-      balance,
-      totalIncome
-    );
-    console.log(data);
-    console.log(error);
-    if (error || data === null) {
-      setErrorMessage(error);
-      return;
+    try {
+      setIsLoading(true);
+      const response = await register(
+        name,
+        email,
+        password,
+        balance,
+        totalIncome
+      );
+      if (response.status !== 200) {
+        setErrorMessage(response.data.message);
+        throw new Error(response.data.message);
+      }
+      sessionStorage.setItem("token", response.data.token);
+      sessionStorage.setItem("email", email);
+      setIsLoading(false);
+      navigate("/home");
+    } catch (error: any) {
+      setErrorMessage(error.message);
+      setIsLoading(false);
     }
-    navigate("/home");
   };
   return (
     <Box

@@ -1,4 +1,4 @@
-import { Box, Paper } from "@mui/material";
+import { Box, Paper, Typography } from "@mui/material";
 import React from "react";
 
 const HomeMainBox = ({
@@ -11,7 +11,7 @@ const HomeMainBox = ({
   return (
     <Paper
       sx={{
-        height: "80vh",
+        height: "20vh",
         width: "70vw",
         display: "flex",
         boxShadow: 10,
@@ -19,19 +19,19 @@ const HomeMainBox = ({
         overflow: "hidden",
       }}
     >
-      <Box
-        sx={{
-          padding: 5,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-          gap: gap ? gap : 2,
-          flex: "1 1 50%",
-          mb: 10,
-        }}
-      >
-        {children}
+      <Box sx={{ padding: 5, display: "flex", flexDirection: "column" }}>
+        <Typography>Bem vindo(a) {sessionStorage.getItem("email")}!</Typography>
+        <Box
+          sx={{
+            padding: 5,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-evenly",
+            flexDirection: "column",
+            gap: gap ? gap : 2,
+            flex: "1 1 50%",
+          }}
+        ></Box>
       </Box>
     </Paper>
   );
